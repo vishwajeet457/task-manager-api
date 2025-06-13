@@ -9,13 +9,12 @@ export class UserRepository implements IUserRepository {
     async findById(id: string): Promise<IUser | undefined> {
         throw new Error("Method not implemented.");
     }
-    create(data: Omit<IUser, "id">): Promise<IUser> {
+
+    async create(data: Omit<IUser, "id">): Promise<IUser> {
         throw new Error("Method not implemented.");
     }
 
-  async findByEmail(email: string): Promise<IUser | undefined> {
-    throw new Error("Method not implemented.");
-  }
-
-  // Similar create() and findById()...
+    async findByEmail(email: string): Promise<IUser | undefined> {
+        throw new Error("Method not implemented.");
+    }
 }
