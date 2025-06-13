@@ -12,10 +12,10 @@ import { SignupRequestDto } from './dto/request/signup.request.dto';
 import { LoginRequestDto } from './dto/request/login.request.dto';
 import { JwtAuthGuard } from './jwt.guard';
 import { ApiTags, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
-import { ResponseHelper } from 'src/common/response/response.helper';
-import { ApiBaseResponse } from 'src/common/decorators/api-base-response.decorator';
+import { ResponseHelper } from '../common/response/response.helper';
+import { ApiBaseResponse } from '../common/decorators/api-base-response.decorator';
 import { LoginResponseDto } from './dto/response/login.response.dto';
-import { BaseResponse } from 'src/common/response/base-response.dto';
+import { BaseResponse } from '../common/response/base-response.dto';
 import { UserResponseDto } from './dto/response/user.response.dto';
 
 @ApiTags('auth')
