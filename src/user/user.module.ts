@@ -1,5 +1,4 @@
 import { Module, Provider } from '@nestjs/common';
-import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { ConfigService } from '@nestjs/config';
 import { JsonUserRepository } from './repositories/json-user-repository';
@@ -19,7 +18,7 @@ const userRepoProvider: Provider = {
 };
 
 @Module({
-  controllers: [UserController],
+  controllers: [],
   providers: [UserService,userRepoProvider],
   exports: [UserService],
 })
