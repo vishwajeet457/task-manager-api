@@ -8,10 +8,15 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignupDto } from './dto/signup.dto';
-import { LoginDto } from './dto/login.dto';
+import { SignupRequestDto } from './dto/request/signup.request.dto';
+import { LoginRequestDto } from './dto/request/login.request.dto';
 import { JwtAuthGuard } from './jwt.guard';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { ResponseHelper } from 'src/common/response/response.helper';
+import { ApiBaseResponse } from 'src/common/decorators/api-base-response.decorator';
+import { LoginResponseDto } from './dto/response/login.response.dto';
+import { BaseResponse } from 'src/common/response/base-response.dto';
+import { UserResponseDto } from './dto/response/user.response.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -20,20 +25,30 @@ export class AuthController {
 
   @Post('signup')
   @HttpCode(200)
-  async signup(@Body() dto: SignupDto) {
-    return this.authService.signup(dto);
+  @ApiBody({ type: SignupRequestDto })
+  @ApiBaseResponse(UserResponseDto, 'Successfully created user')
+  async signup(@Body() dto: SignupRequestDto) : Promise<BaseResponse<UserResponseDto>> {
+    const response =  await this.authService.signup(dto);
+    const { password, ...safeUser } = response;
+    return ResponseHelper.success<UserResponseDto>('User created', safeUser);
+   
   }
 
   @Post('login')
-  async login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  @HttpCode(200)
+  @ApiBody({ type: LoginRequestDto })
+  @ApiBaseResponse(LoginResponseDto, 'Login successful')
+  async login(@Body() dto: LoginRequestDto) : Promise<BaseResponse<LoginResponseDto>> {
+    const response =  await this.authService.login(dto);
+    return ResponseHelper.success<LoginResponseDto>('Login successful', response);
   }
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get('me')
-  async getMe(@Req() req) { 
+  @ApiBaseResponse(UserResponseDto, 'User details retrieved successfully')
+  async getMe(@Req() req) : Promise<BaseResponse<UserResponseDto>>  { 
     const { password, ...safeUser } = req.user;
-    return safeUser;
+     return ResponseHelper.success<UserResponseDto>('success', safeUser);
   }
 }
