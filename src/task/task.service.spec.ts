@@ -3,7 +3,7 @@ import { TaskService } from './task.service';
 import { ITaskRepository } from './interfaces/task-repository.interface';
 import { CreateTaskRequestDto } from './dto/request/create-task.request.dto';
 import { UpdateTaskRequestDto } from './dto/request/update-task.request.dto';
-import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { ITask } from './interfaces/task.interface';
 
 describe('TaskService', () => {
@@ -30,7 +30,13 @@ describe('TaskService', () => {
   const mockUpdateTaskDto: UpdateTaskRequestDto = {
     id: mockTaskId,
     name: 'Updated Task',
+    dueDate: '2025-12-31T23:59:59Z',
     priority: 2
+  };
+
+  const updatedTask: ITask = {
+    ...mockTask,
+    ...mockUpdateTaskDto
   };
 
   beforeEach(async () => {
@@ -119,15 +125,18 @@ describe('TaskService', () => {
   describe('update', () => {
     it('should update a task successfully when user owns it', async () => {
       mockTaskRepository.findById.mockResolvedValue(mockTask);
-      mockTaskRepository.update.mockResolvedValue({
-        ...mockTask,
-        ...mockUpdateTaskDto
-      });
+      mockTaskRepository.update.mockResolvedValue(updatedTask);
       
       const result = await service.update(mockUserId, mockUpdateTaskDto);
       
       expect(result).toBeDefined();
-      expect(mockTaskRepository.update).toHaveBeenCalledWith(mockTaskId, mockUpdateTaskDto);
+      expect(mockTaskRepository.findById).toHaveBeenCalledWith(mockTaskId);
+
+     expect(mockTaskRepository.update).toHaveBeenCalledWith(mockTaskId, {
+        name: 'Updated Task',
+        dueDate: '2025-12-31T23:59:59Z',
+        priority: 2
+      });
     });
 
     it('should throw NotFoundException when task does not exist', async () => {
@@ -149,13 +158,13 @@ describe('TaskService', () => {
         .toThrow(ForbiddenException);
     });
 
-    it('should throw NotFoundException when update fails', async () => {
+    it('should throw BadRequestException when update fails', async () => {
       mockTaskRepository.findById.mockResolvedValue(mockTask);
       mockTaskRepository.update.mockResolvedValue(null);
       
       await expect(service.update(mockUserId, mockUpdateTaskDto))
         .rejects
-        .toThrow(NotFoundException);
+        .toThrow(BadRequestException);
     });
   });
 
@@ -188,4 +197,5 @@ describe('TaskService', () => {
         .toThrow(ForbiddenException);
     });
   });
+
 });

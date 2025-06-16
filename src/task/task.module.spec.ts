@@ -81,7 +81,7 @@ describe('TaskModule', () => {
     it('should correctly configure the provider', () => {
       const provider = taskRepoProvider as any;
       expect(provider.provide).toBe('ITaskRepository');
-      expect(provider.inject).toEqual([ConfigService]);
+      expect(provider.inject).toEqual([ConfigService,'PG_POOL']);
     });
 
     describe('factory', () => {

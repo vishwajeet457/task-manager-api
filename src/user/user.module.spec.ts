@@ -3,12 +3,15 @@ import { UserModule, userRepoProvider } from './user.module';
 import { JsonUserRepository } from './repositories/json-user-repository';
 import { UserRepository } from './repositories/user-repository';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserService } from './user.service';
+import { IUserService } from './interfaces/user.service.interface';
 import { IUser } from './interfaces/user.interface';
+import { UserService } from './user.service';
+import { Pool } from 'pg';
 
 describe('UserModule', () => {
   let mockUser: IUser;
   let mockConfigService: ConfigService;
+  let mockPool: Partial<Pool>;
 
   beforeEach(() => {
     mockUser = {
@@ -18,6 +21,12 @@ describe('UserModule', () => {
       lastName: 'Doe',
       password: 'hashedPassword123'
     };
+
+    mockPool = {
+    query: jest.fn(),
+    connect: jest.fn(),
+    end: jest.fn()
+  } as any;
 
     mockConfigService = {
       get: jest.fn()
@@ -46,7 +55,7 @@ describe('UserModule', () => {
       expect(moduleRef).toBeDefined();
 
       // Test UserService
-      const service = moduleRef.get(UserService);
+      const service = moduleRef.get('IUserService');
       expect(service).toBeDefined();
       expect(service).toBeInstanceOf(UserService);
 
@@ -90,7 +99,7 @@ describe('UserModule', () => {
       .useValue(mockConfigService)
       .compile();
 
-      const service = moduleRef.get(UserService);
+      const service = moduleRef.get('IUserService');
       expect(service).toBeDefined();
       expect(service).toBeInstanceOf(UserService);
     });
@@ -100,23 +109,25 @@ describe('UserModule', () => {
     it('should correctly configure the provider', () => {
       const provider = userRepoProvider as any;
       expect(provider.provide).toBe('IUserRepository');
-      expect(provider.inject).toEqual([ConfigService]);
+      expect(provider.inject).toEqual([ConfigService,'PG_POOL']);
     });
 
     describe('factory', () => {
       it('should return JsonUserRepository when DB_MODE is json', () => {
         jest.spyOn(mockConfigService, 'get').mockReturnValue('json');
-        const repo = (userRepoProvider as any).useFactory(mockConfigService);
+        const repo = (userRepoProvider as any).useFactory(mockConfigService,mockPool);
         expect(repo).toBeInstanceOf(JsonUserRepository);
       });
 
       it('should return UserRepository when DB_MODE is not json', () => {
         jest.spyOn(mockConfigService, 'get').mockReturnValue('postgres');
-        const repo = (userRepoProvider as any).useFactory(mockConfigService);
+        const repo = (userRepoProvider as any).useFactory(mockConfigService, mockPool);
         expect(repo).toBeInstanceOf(UserRepository);
-      });      it('should return UserRepository when DB_MODE is undefined', () => {
+      });      
+      
+      it('should return UserRepository when DB_MODE is undefined', () => {
         jest.spyOn(mockConfigService, 'get').mockReturnValue(undefined);
-        const repo = (userRepoProvider as any).useFactory(mockConfigService);
+        const repo = (userRepoProvider as any).useFactory(mockConfigService,mockPool);
         expect(repo).toBeInstanceOf(UserRepository);
         expect(mockConfigService.get).toHaveBeenCalledWith('DB_MODE');
       });

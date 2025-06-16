@@ -5,10 +5,11 @@ import { JwtService } from '@nestjs/jwt';
 import { BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { IUser } from '../user/interfaces/user.interface';
+import { IUserService } from '../user/interfaces/user.service.interface';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userService: jest.Mocked<UserService>;
+  let userService: jest.Mocked<IUserService>;
   let jwtService: jest.Mocked<JwtService>;
 
   const mockUser: IUser = {
@@ -36,7 +37,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         {
-          provide: UserService,
+          provide: 'IUserService',
           useValue: {
             findByEmail: jest.fn(),
             create: jest.fn(),
@@ -52,7 +53,7 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    userService = module.get(UserService);
+    userService = module.get('IUserService');
     jwtService = module.get(JwtService);
   });
 
@@ -107,6 +108,7 @@ describe('AuthService', () => {
       userService.findByEmail.mockResolvedValue(undefined);
 
       await expect(service.login(loginDto)).rejects.toThrow(BadRequestException);
+      expect(jwtService.signAsync).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException if password is incorrect', async () => {
@@ -114,6 +116,7 @@ describe('AuthService', () => {
       jest.spyOn(bcrypt, 'compare').mockResolvedValueOnce(false);
 
       await expect(service.login(loginDto)).rejects.toThrow(BadRequestException);
+      expect(jwtService.signAsync).not.toHaveBeenCalled();
     });
   });
 });
