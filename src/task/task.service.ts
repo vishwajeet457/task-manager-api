@@ -1,5 +1,5 @@
 // src/task/task.service.ts
-import { Inject, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { CreateTaskRequestDto } from './dto/request/create-task.request.dto';
 import { UpdateTaskRequestDto } from './dto/request/update-task.request.dto';
 import { ITaskRepository } from './interfaces/task-repository.interface';
@@ -31,8 +31,12 @@ export class TaskService implements ITaskService {
     if (!task) throw new NotFoundException('Task not found');
     if (task.userId !== userId) throw new ForbiddenException('Not allowed');
 
-    const updated = await this.repo.update(dto.id, dto);
-    if (!updated) throw new NotFoundException('Task update failed');
+    const updated = await this.repo.update(dto.id, {
+      name: dto.name,
+      dueDate: dto.dueDate,
+      priority: dto.priority
+    } as Partial<ITask>);
+    if (!updated) throw new BadRequestException('Task update failed');
     return updated;
   }
 
