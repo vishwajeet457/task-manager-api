@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JsonUserRepository } from './repositories/json-user-repository';
 import { UserRepository } from './repositories/user-repository';
 
-const userRepoProvider: Provider = {
+export const userRepoProvider: Provider = {
   provide: 'IUserRepository',
   useFactory: (config: ConfigService) => {
     const dbMode = config.get('DB_MODE');
@@ -18,8 +18,9 @@ const userRepoProvider: Provider = {
 };
 
 @Module({
+  imports: [],
   controllers: [],
-  providers: [UserService,userRepoProvider],
+  providers: [UserService, userRepoProvider],
   exports: [UserService],
 })
 export class UserModule {}
