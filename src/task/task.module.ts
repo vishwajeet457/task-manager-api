@@ -1,11 +1,11 @@
 import { Module, Provider } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JsonTaskRepository } from './repository/json-task-repository';
 import { TaskRepository } from './repository/task-repository';
-import { TaskService } from 'src/task/task.service';
+import { TaskService } from './task.service';
 import { TaskController } from './task.controller';
 
-const taskRepoProvider: Provider = {
+export const taskRepoProvider: Provider = {
   provide: 'ITaskRepository',
   useFactory: (config: ConfigService) => {
     const dbMode = config.get('DB_MODE');
@@ -27,6 +27,7 @@ const taskRepoProvider: Provider = {
       },
       taskRepoProvider
     ],
+    imports: [ConfigModule],
     exports: [],
 })
 export class TaskModule {

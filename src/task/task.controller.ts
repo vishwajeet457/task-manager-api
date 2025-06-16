@@ -8,6 +8,7 @@ import {
   Req,
   HttpCode,
   Inject,
+  Delete,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
@@ -46,7 +47,7 @@ export class TaskController {
 
   @Get(':id')
   @ApiParam({ name: 'id', required: true })
-  @ApiBaseResponse(Object, 'Task retrieved successfully')
+  @ApiBaseResponse(TaskResponseDto, 'Task retrieved successfully')
   async findById(@Req() req, @Param('id') id: string) : Promise<BaseResponse<ITask>> {
     const task = await this.taskService.getById(req.user.id, id);
     return ResponseHelper.success<ITask>('Task retrieved successfully', task);
@@ -54,19 +55,18 @@ export class TaskController {
 
   @Post('update')
   @HttpCode(200)
-  @ApiParam({ name: 'id', required: true })
   @ApiBody({ type: UpdateTaskRequestDto })
-  @ApiBaseResponse(Object, 'Task updated successfully')
+  @ApiBaseResponse(TaskResponseDto, 'Task updated successfully')
   async update(@Req() req,  @Body() dto: UpdateTaskRequestDto) : Promise<BaseResponse<ITask>> {
     const task = await this.taskService.update(req.user.id, dto);
     return ResponseHelper.success<ITask>('Task updated successfully', task);
   }
 
-  @Post(':id')
-  @HttpCode(204)
+  @Delete('delete/:id')
+  @HttpCode(200)
   @ApiParam({ name: 'id', required: true })
   async remove(@Req() req, @Param('id') id: string) {
     await this.taskService.delete(req.user.id, id);
-    return ResponseHelper.success('Task updated successfully', null);;
+    return ResponseHelper.success('Task deleted successfully', null);;
   }
 }
