@@ -41,6 +41,11 @@ npm install
 
 ## Docker Usage
 
+if you are using Docker Desktop with Windows containers enabled switch Docker to use Linux containers
+
+- Right-click the Docker icon in your system tray.
+- Select "Switch to Linux containers..."
+
 1. **Build the Docker image:**
    ```bash
    docker build -t task-manager-api .
