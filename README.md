@@ -71,5 +71,6 @@ The API will be available at `http://localhost:3000`.
 
  -  Token does not expire
  -  For every login request a new token is issued, but it is not being kept in DB.
+ - While running in docker, your db needs to be accessible from the container environment
 
 
