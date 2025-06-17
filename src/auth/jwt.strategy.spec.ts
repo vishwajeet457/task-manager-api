@@ -34,7 +34,7 @@ describe('JwtStrategy', () => {
           },
         },
         {
-          provide: UserService,
+          provide: 'IUserService',
           useValue: {
             findById: jest.fn(),
           },
@@ -43,7 +43,7 @@ describe('JwtStrategy', () => {
     }).compile();
 
     strategy = module.get<JwtStrategy>(JwtStrategy);
-    userService = module.get(UserService);
+    userService = module.get('IUserService');
     configService = module.get(ConfigService);
   });
 
@@ -54,6 +54,7 @@ describe('JwtStrategy', () => {
   describe('constructor', () => {
     it('should properly initialize with config', () => {
       expect(configService.get).toHaveBeenCalledWith('JWT_SECRET');
+    
       expect(strategy).toBeDefined();
     });
   });
