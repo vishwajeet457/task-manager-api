@@ -14,6 +14,16 @@ A simple NestJS-based API for managing tasks.
 npm install
 ```
 
+### Setting the Environment
+- Create a .env file at the root of the application
+```
+PORT=3000
+JWT_SECRET=your_jwt_secret
+DATABASE_URL=postgres://user:pass@host.docker.internal:5432/mydb
+DB_MODE=<db|json>
+```
+-DB_MODE=json will simulate the app using json files.
+
 ### Running the Application
 - Development:
   ```bash
