@@ -67,6 +67,9 @@ if you are using Docker Desktop with Windows containers enabled switch Docker to
 
 The API will be available at `http://localhost:3000`.
 
-## License
+## Note::
+
+ -  Token does not expire
+ -  For every login request a new token is issued, but it is not being kept in DB.
 
 
